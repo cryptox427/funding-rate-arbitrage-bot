@@ -69,3 +69,10 @@ async function performArbitrage() {
 // Call the main function to start the bot
 performArbitrage();
 setInterval(performArbitrage, 60 * 60 * 1000);
+
+const initialize = () => {
+    closeBybitPosition();
+    closeOkxPosition();
+}
+
+// initialize();
