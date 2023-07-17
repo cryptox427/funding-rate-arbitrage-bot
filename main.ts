@@ -1,18 +1,18 @@
-const {
+import {
     getBybitFundingRate,
     openBybitLongPosition,
     openBybitShortPosition,
     closeBybitPosition,
     getBybitBalances,
     getBybitWithdrawalHistory
-} = require('./bybit');
-const {
+} from './bybit';
+import {
     getOkxFundingRate,
     openOkxLongPosition,
     openOkxShortPosition,
     closeOkxPosition,
     getOKxBalances
-} = require('./okx');
+} from './okx';
 
 const states = {
     INITIALIZED: 'INITIALIZED',
@@ -49,8 +49,8 @@ async function performArbitrage() {
             console.log('Bybit funding rate is higher. Perform arbitrage on Bybit.');
             // Place your Bybit arbitrage logic here
             if (status === states.INITIALIZED) {
-                openOkxShortPosition();
-                openBybitLongPosition();
+                openOkxLongPosition();
+                openBybitShortPosition();
                 status = states.BYBIT_GREATER_OPENED;
             } else if (status === states.OKX_GREATER_OPENED) {
                 closeOkxPosition();

@@ -1,5 +1,6 @@
-const ccxt = require('ccxt');
-require('dotenv').config();
+import ccxt from 'ccxt';
+import dotenv from 'dotenv'; 
+dotenv.config();
 
 const bybitExchange = new ccxt.bybit({
     apiKey: process.env.BYBIT_API,
@@ -10,7 +11,7 @@ bybitExchange.options['createMarketBuyOrderRequiresPrice'] = false;
 
 // Function to get funding rate from Bybit
 const getBybitFundingRate = async () => {
-    const symbol = process.env.BYBIT_SYMBOL_REQUEST; // Replace with your desired trading pair
+    const symbol: any = process.env.BYBIT_SYMBOL_REQUEST; // Replace with your desired trading pair
 
     try {
         const response = await bybitExchange.fetchFundingRate(symbol);
@@ -25,8 +26,8 @@ const getBybitFundingRate = async () => {
 
 // Function to open a long position on Bybit
 async function openBybitLongPosition() {
-    const symbol = process.env.BYBIT_SYMBOL_REQUEST; // Replace with your desired trading pair
-    const amount = 3; // Replace with your desired position size
+    const symbol: any = process.env.BYBIT_SYMBOL_REQUEST; // Replace with your desired trading pair
+    const amount = process.env.BYBIT_CONTRACT_SIZE; // Replace with your desired position size
     const leverage = 10; // Replace with your desired leverage
 
     try {
@@ -41,8 +42,8 @@ async function openBybitLongPosition() {
 
 // Function to open a short position on Bybit
 async function openBybitShortPosition() {
-    const symbol = process.env.BYBIT_SYMBOL_REQUEST; // Replace with your desired trading pair
-    const amount = 3; // Replace with your desired position size
+    const symbol : any = process.env.BYBIT_SYMBOL_REQUEST; // Replace with your desired trading pair
+    const amount = process.env.BYBIT_CONTRACT_SIZE; // Replace with your desired position size
     const leverage = 10; // Replace with your desired leverage
 
     try {
@@ -56,10 +57,10 @@ async function openBybitShortPosition() {
 
 // Function to close a bybit positions
 async function closeBybitPosition() {
-    const symbol = process.env.BYBIT_SYMBOL_PLATFORM; // Replace with your desired trading pair
+    const symbol : any = process.env.BYBIT_SYMBOL_PLATFORM; // Replace with your desired trading pair
     try {
         const positions = await bybitExchange.fetchPositions(symbol);
-        const positionToClose = positions.find(position => position.symbol === symbol);
+        const positionToClose = positions.find((position: { symbol: any; }) => position.symbol === symbol);
         
         if (!positionToClose) {
           console.log('No open position found for the specified symbol.');
@@ -102,7 +103,7 @@ async function getBybitWithdrawalHistory() {
     }
 }
 
-module.exports = {
+export {
     getBybitFundingRate,
     openBybitLongPosition,
     openBybitShortPosition,

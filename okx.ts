@@ -1,4 +1,6 @@
-const ccxt = require('ccxt');
+import ccxt from 'ccxt';
+import dotenv from 'dotenv'; 
+dotenv.config();
 require('dotenv').config();
 
 // Create exchange instances
@@ -14,7 +16,7 @@ const okxExchange = new ccxt.okex({
 
 // Function to get funding rate from OKX
 const getOkxFundingRate = async () => {
-    const symbol = process.env.OKX_SYMBOL_REQUEST; // Replace with your desired trading pair
+    const symbol: any = process.env.OKX_SYMBOL_REQUEST; // Replace with your desired trading pair
 
     try {
         const response = await okxExchange.fetchFundingRate(symbol);
@@ -30,8 +32,8 @@ const getOkxFundingRate = async () => {
 
 // Function to open a short position on OKX
 async function openOkxShortPosition() {
-    const symbol = process.env.OKX_SYMBOL_REQUEST; // Replace with your desired trading pair
-    const amount = 1; // Replace with your desired position size
+    const symbol: any = process.env.OKX_SYMBOL_REQUEST; // Replace with your desired trading pair
+    const amount = process.env.OKX_CONTRACT_SIZE; // Replace with your desired position size
 
     try {
         const response = await okxExchange.createMarketSellOrder(symbol, amount, { type: 'swap' });
@@ -44,8 +46,8 @@ async function openOkxShortPosition() {
 
 // Function to open a long position on OKX
 async function openOkxLongPosition() {
-    const symbol = process.env.OKX_SYMBOL_REQUEST; // Replace with your desired trading pair
-    const amount = 1; // Replace with your desired position size
+    const symbol: any = process.env.OKX_SYMBOL_REQUEST; // Replace with your desired trading pair
+    const amount = process.env.OKX_CONTRACT_SIZE; // Replace with your desired position size
 
     try {
         const response = await okxExchange.createMarketBuyOrder(symbol, amount, { type: 'swap' });
@@ -62,7 +64,7 @@ async function closeOkxPosition() {
     const position_id = '600211816320892928';
     try {
         const positions = await okxExchange.fetchPositions();
-    const positionToClose = positions.find(position => position.symbol === symbol);
+    const positionToClose = positions.find((position: { symbol: string | undefined; }) => position.symbol === symbol);
     
     if (!positionToClose) {
       console.log('No open position found for the specified symbol.');
@@ -98,7 +100,7 @@ async function getOKxBalances() {
     }
 }
 
-module.exports = {
+export {
     getOkxFundingRate,
     openOkxLongPosition,
     openOkxShortPosition,
