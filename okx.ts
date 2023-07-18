@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 require('dotenv').config();
 
+let config: any;
+
 // Create exchange instances
 const okxExchange = new ccxt.okex({
     apiKey: process.env.OKX_API,
@@ -15,8 +17,10 @@ const okxExchange = new ccxt.okex({
 
 
 // Function to get funding rate from OKX
-const getOkxFundingRate = async () => {
-    const symbol: any = process.env.OKX_SYMBOL_REQUEST; // Replace with your desired trading pair
+const getOkxFundingRate = async (_config: object) => {
+    config = _config;
+    console.log('config-----',config.OKX_SYMBOL_REQUEST);
+    const symbol: any = config.OKX_SYMBOL_REQUEST; // Replace with your desired trading pair
 
     try {
         const response = await okxExchange.fetchFundingRate(symbol);
@@ -32,7 +36,7 @@ const getOkxFundingRate = async () => {
 
 // Function to open a short position on OKX
 async function openOkxShortPosition() {
-    const symbol: any = process.env.OKX_SYMBOL_REQUEST; // Replace with your desired trading pair
+    const symbol: any = config.OKX_SYMBOL_REQUEST; // Replace with your desired trading pair
     const amount = process.env.OKX_CONTRACT_SIZE; // Replace with your desired position size
 
     try {
@@ -46,7 +50,7 @@ async function openOkxShortPosition() {
 
 // Function to open a long position on OKX
 async function openOkxLongPosition() {
-    const symbol: any = process.env.OKX_SYMBOL_REQUEST; // Replace with your desired trading pair
+    const symbol: any = config.OKX_SYMBOL_REQUEST; // Replace with your desired trading pair
     const amount = process.env.OKX_CONTRACT_SIZE; // Replace with your desired position size
 
     try {
@@ -60,7 +64,7 @@ async function openOkxLongPosition() {
 
 // Function to close a perpetual swap position on OKEx
 async function closeOkxPosition() {
-    const symbol = process.env.OKX_SYMBOL_PLATFORM; // Replace with your desired trading pair
+    const symbol = config.OKX_SYMBOL_PLATFORM; // Replace with your desired trading pair
     const position_id = '600211816320892928';
     try {
         const positions = await okxExchange.fetchPositions();
