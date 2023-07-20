@@ -1,5 +1,5 @@
 import ccxt from 'ccxt';
-import dotenv from 'dotenv'; 
+import dotenv from 'dotenv';
 dotenv.config();
 let config: any;
 
@@ -26,9 +26,9 @@ const getBybitFundingRate = async (_config: any) => {
 }
 
 // Function to open a long position on Bybit
-async function openBybitLongPosition() {
-    const symbol: any = config.BYBIT_SYMBOL_REQUEST; // Replace with your desired trading pair
-    const amount = process.env.BYBIT_CONTRACT_SIZE; // Replace with your desired position size
+async function openBybitLongPosition(symbol: string = config.BYBIT_SYMBOL_REQUEST, amount: any = process.env.BYBIT_CONTRACT_SIZE) {
+    // const symbol: any = config.BYBIT_SYMBOL_REQUEST; // Replace with your desired trading pair
+    // const amount = process.env.BYBIT_CONTRACT_SIZE; // Replace with your desired position size
     const leverage = 10; // Replace with your desired leverage
 
     try {
@@ -42,9 +42,9 @@ async function openBybitLongPosition() {
 
 
 // Function to open a short position on Bybit
-async function openBybitShortPosition() {
-    const symbol : any = config.BYBIT_SYMBOL_REQUEST; // Replace with your desired trading pair
-    const amount = process.env.BYBIT_CONTRACT_SIZE; // Replace with your desired position size
+async function openBybitShortPosition(symbol: string = config.BYBIT_SYMBOL_REQUEST, amount: any = process.env.BYBIT_CONTRACT_SIZE) {
+    // const symbol: any = config.BYBIT_SYMBOL_REQUEST; // Replace with your desired trading pair
+    // const amount = process.env.BYBIT_CONTRACT_SIZE; // Replace with your desired position size
     const leverage = 10; // Replace with your desired leverage
 
     try {
@@ -58,27 +58,48 @@ async function openBybitShortPosition() {
 
 // Function to close a bybit positions
 async function closeBybitPosition() {
-    const symbol : any = config.BYBIT_SYMBOL_PLATFORM; // Replace with your desired trading pair
+    const symbol: any = config.BYBIT_SYMBOL_PLATFORM; // Replace with your desired trading pair
     try {
-        const positions = await bybitExchange.fetchPositions(symbol);
+        const positions = await bybitExchange.fetchPositions();
+        console.log('bybit positions', positions);
         const positionToClose = positions.find((position: { symbol: any; }) => position.symbol === symbol);
-        
+
         if (!positionToClose) {
-          console.log('No open position found for the specified symbol.');
-          return;
+            console.log('No open position found for the specified symbol.');
+            return;
         }
-        
+
         const side = positionToClose.side;
-        const amount =positionToClose.contracts;
+        const amount = positionToClose.contracts;
         if (side === 'long') {
-            openBybitShortPosition();
+            openBybitShortPosition(positionToClose.info.symbol, amount);
         } else {
-            openBybitLongPosition();
+            openBybitLongPosition(positionToClose.info.symbol, amount);
         }
         console.log(positions, positionToClose, side, amount)
     } catch (error) {
         console.error('Failed to close position on Bybit position:', error);
-    throw error;
+        throw error;
+    }
+}
+
+async function closeBybitAllPosition() {
+    try {
+        const positions = await bybitExchange.fetchPositions();
+        positions.map((positionToClose: {
+            info: any; side: any; contracts: any; 
+}) => {
+            const side = positionToClose.side;
+            const amount = positionToClose.contracts;
+            if (side === 'long') {
+                openBybitShortPosition(positionToClose.info.symbol, amount);
+            } else {
+                openBybitLongPosition(positionToClose.info.symbol, amount);
+            }
+        })
+    } catch (error) {
+        console.error('Failed to close position on Bybit position:', error);
+        throw error;
     }
 }
 
@@ -104,11 +125,24 @@ async function getBybitWithdrawalHistory() {
     }
 }
 
+async function getBybitAllPositions () {
+    try {
+        const positions = await bybitExchange.fetchPositions();
+        // console.log('bybit positions', positions);
+        return positions;
+    } catch (error) {
+        console.error('Failed to fetch Bybit position data:', error);
+        throw error;
+    }
+}
+
 export {
     getBybitFundingRate,
     openBybitLongPosition,
     openBybitShortPosition,
     closeBybitPosition,
     getBybitBalances,
-    getBybitWithdrawalHistory
+    getBybitWithdrawalHistory,
+    closeBybitAllPosition,
+    getBybitAllPositions
 }

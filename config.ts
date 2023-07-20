@@ -10,7 +10,13 @@ class Config {
     BYBIT_SYMBOL_PLATFORM: string | undefined;
     BYBIT_SYMBOL_TO_CLOSE: string | undefined;
     SYMBOM: string | undefined;
-    INITIALIZED: boolean | false = false;
+    SYMBOL_LIST: object | undefined;
+    STATUS: any | undefined;
+    states = {
+        INITIALIZED: 'INITIALIZED',
+        BYBIT_GREATER_OPENED: 'BYBIT_GREATER_OPENED',
+        OKX_GREATER_OPENED: 'OKX_GREATER_OPENED'
+    }
 
     constructor() {
         this.monitorData();
@@ -35,6 +41,7 @@ class Config {
             const dataLength = data.data.length;
             let symbol: string = '';
             let rate: number = 0;
+            let symbol_list = [];
     
             for (let i = 1; i <= dataLength; i++) {
                 if (data.data[i]?.uMarginList !== undefined) {
@@ -47,19 +54,30 @@ class Config {
                             symbol = data.data[i].symbol;
                             rate = Math.abs(bybit - okx);
                         }
-    
+                        symbol_list.push({
+                            symbol: data.data[i].symbol,
+                            rate: Math.abs(bybit - okx),
+                            bybit,
+                            okx,
+                            logo: data.data[i].symbolLogo
+                        })
                     }
                 }
             }
+            this.SYMBOL_LIST = symbol_list.sort((a, b) => {
+                return a.rate > b.rate ? -1 : 1;                
+            });
             if (this.SYMBOM !== symbol) {
                 this.SYMBOM = symbol;
-                this.OKX_SYMBOL_TO_CLOSE = this.OKX_SYMBOL_PLATFORM;
-                this.BYBIT_SYMBOL_TO_CLOSE = this.BYBIT_SYMBOL_PLATFORM;
+                // this.OKX_SYMBOL_TO_CLOSE = this.OKX_SYMBOL_PLATFORM;
+                // this.BYBIT_SYMBOL_TO_CLOSE = this.BYBIT_SYMBOL_PLATFORM;
+                this.OKX_SYMBOL_TO_CLOSE = `${symbol}/USDT:USDT`;
+                this.BYBIT_SYMBOL_TO_CLOSE = `${symbol}/USDT:USDT`;
                 this.OKX_SYMBOL_REQUEST = `${symbol}-USDT-SWAP`;
                 this.OKX_SYMBOL_PLATFORM = `${symbol}/USDT:USDT`;
                 this.BYBIT_SYMBOL_REQUEST = `${symbol}USDT`;
                 this.BYBIT_SYMBOL_PLATFORM = `${symbol}/USDT:USDT`
-                this.INITIALIZED = false;
+                this.STATUS = this.states.INITIALIZED;
             }
 
         } catch (error) {
@@ -71,8 +89,8 @@ class Config {
         setInterval(this.monitorData, 1 * 10 * 1000)
     }
 
-    updateInitialized(_initialized: boolean) {
-        this.INITIALIZED = _initialized;
+    updateStatus(_status: string) {
+        this.STATUS = _status;
     }
 
 }
